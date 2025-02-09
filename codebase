@@ -1,0 +1,67 @@
+CREATE DATABASE StudentManagement;
+USE StudentManagement;
+CREATE TABLE Students (
+    StudentID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(50),
+    Gender VARCHAR(1),
+    Age INT,
+    Grade VARCHAR(10),
+    MathScore INT,
+    ScienceScore INT,
+    EnglishScore INT
+);
+CREATE TABLE Courses (
+    CourseID INT AUTO_INCREMENT PRIMARY KEY,
+    CourseName VARCHAR(100),
+    CourseDescription TEXT
+);
+CREATE TABLE Enrolments (
+    EnrolmentID INT AUTO_INCREMENT PRIMARY KEY,
+    StudentID INT,
+    CourseID INT,
+    EnrolmentDate DATE,
+    FOREIGN KEY (StudentID) REFERENCES Students(StudentID),
+    FOREIGN KEY (CourseID) REFERENCES Courses(CourseID)
+);
+INSERT INTO Students (Name, Gender, Age, Grade, MathScore, ScienceScore, EnglishScore)
+VALUES 
+('RIYA', 'F', 16, 'A', 95, 90, 88),
+('RAM', 'M', 17, 'B', 80, 85, 82),
+('Charlie', 'M', 15, 'A', 92, 87, 91);
+
+INSERT INTO Courses (CourseName, CourseDescription)
+VALUES
+('Mathematics', 'Advanced math course'),
+('Science', 'Fundamentals of science'),
+('English', 'Comprehensive English course');
+
+INSERT INTO Enrolments (StudentID, CourseID, EnrolmentDate)
+VALUES
+(1, 1, '2023-01-10'),
+(1, 2, '2023-02-15'),
+(2, 1, '2023-03-20'),
+(3, 3, '2023-04-05');
+-- QUERY NO 1
+-- Task 1: List all students and the courses they are enrolled in.
+SELECT S.NAME,C.CourseName FROM STUDENTS S 
+INNER JOIN Enrolments E ON E.StudentID=S.StudentID 
+INNER JOIN Courses C ON C.CourseID=E.CourseID;
+-- QUERY NO 2
+-- Task 2: Find the number of students enrolled in each course.
+SELECT c.CourseName, COUNT(e.StudentID) AS EnrolledStudents
+FROM Courses c
+LEFT JOIN Enrolments e ON c.CourseID = e.CourseID
+GROUP BY c.CourseID, c.CourseName;
+-- QUERY NO 3
+-- Students Enrolled in More Than One Course.
+SELECT s.Name, COUNT(e.CourseID) AS CourseCount
+FROM Students s
+INNER JOIN Enrolments e ON s.StudentID = e.StudentID
+GROUP BY s.Name
+HAVING COUNT(e.CourseID) > 1;
+-- QUERY NO 4
+--  Courses with No Enrolled Students.
+SELECT c.CourseName
+FROM Courses c
+LEFT JOIN Enrolments e ON c.CourseID = e.CourseID
+WHERE e.EnrolmentID IS NULL;
